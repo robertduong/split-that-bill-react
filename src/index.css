@@ -1,0 +1,49 @@
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Roboto', Arial, Helvetica, sans-serif !important; 
+  font-weight: lighter;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-repeat: no-repeat;
+  color: #fff;
+}
+
+.host {
+  background: #eee;
+  color: #555;
+  min-height: 100%;
+  min-height: 100vh;
+  font-size: 2rem;
+}
+
+.header {
+  background-repeat: no-repeat;
+  background: #fd676a;
+  background: -webkit-linear-gradient(#fd676a, #fd1999); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(#fd676a, #fd1999); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(#fd676a, #fd1999); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(#fd676a, #fd1999); /* Standard syntax */
+  color: #fff;
+}
+
+a {
+  color: #fff;
+}
+
+.vertical-center {
+  min-height: 100%;
+  min-height: 100vh;
+  background: #2c3e50;
+  background: -webkit-linear-gradient(#2c3e50, #34495e); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(#2c3e50, #34495e); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(#2c3e50, #34495e); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(#3c2e40, #34495e); /* Standard syntax */
+
+  display: flex;
+  align-items: center;
+}
