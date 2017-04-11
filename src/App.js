@@ -4,6 +4,7 @@ import Container from './Container';
 import MainMenu from './MainMenu';
 import Host from './Host';
 import Join from './Join';
+import JoinMenu from './JoinMenu';
 
 
 class App extends React.Component {
@@ -17,6 +18,7 @@ class App extends React.Component {
           </Route>
           <Route path="join" component={Container}>
             <IndexRoute component={Join} />
+            <Route path="option" component={JoinMenu}></Route>
           </Route>
         </Route>
       </Router>
