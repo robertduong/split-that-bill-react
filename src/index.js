@@ -13,7 +13,7 @@ const config = {
   messagingSenderId: "372760952070"
 };
 
-const fb = firebase.initializeApp(config).database().ref();
+const fb = firebase.initializeApp(config).database();
 
 ReactDOM.render(
   <App fb={fb}/>,

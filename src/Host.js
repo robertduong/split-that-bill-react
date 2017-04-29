@@ -75,22 +75,31 @@ const Payments = (props) =>
   </ListGroup>
 
 class Host extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.state = {
+      members: []
+    }
   }
 
   componentWillMount() {
-    this.props.fb.on('value', (snapshot) => {
+    this.props.route.firebase.ref('members/123456').on('value', (snapshot) => {
       console.log('Firebase update!');
-      snapshot.val().sessions.map((v) => console.log(v));
-    });
+      snapshot.val().map((v) => console.log(v));
+      this.setState({members: snapshot.val()});
+     });
+
+    console.log(this.state.members);
+    console.log(this.props.location);
+    console.log(this.props);
+    console.log(this.props.params);
   }
 
   render() {
     return (
       <div className="host">
         <Header />
-        <Payments names={n}/>
+        <Payments names={this.state.members}/>
       </div>
     );
   }

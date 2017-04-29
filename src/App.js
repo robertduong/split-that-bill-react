@@ -8,13 +8,16 @@ import JoinMenu from './JoinMenu';
 
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
       <Router history={browserHistory}> 
         <Route path="/" component={Container}>
           <IndexRoute component={MainMenu} />
-          <Route path="host" component={Container}>
-            <IndexRoute component={() => (<Host fb={this.props.fb}/>)} />
+          <Route firebase={this.props.fb} path="host/:action" component={Host}>
           </Route>
           <Route path="join" component={Container}>
             <IndexRoute component={Join} />
