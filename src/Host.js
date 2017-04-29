@@ -74,10 +74,26 @@ const Payments = (props) =>
     {listNames(props.names)}
   </ListGroup>
 
-const Host = (props) => 
-  <div className="host">
-    <Header />
-    <Payments names={n}/>
-  </div>
+class Host extends React.Component {
+  constructor() {
+    super();
+  }
 
-export default Host
+  componentWillMount() {
+    this.props.fb.on('value', (snapshot) => {
+      console.log('Firebase update!');
+      snapshot.val().sessions.map((v) => console.log(v));
+    });
+  }
+
+  render() {
+    return (
+      <div className="host">
+        <Header />
+        <Payments names={n}/>
+      </div>
+    );
+  }
+}
+
+export default Host;

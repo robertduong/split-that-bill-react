@@ -14,7 +14,7 @@ class App extends React.Component {
         <Route path="/" component={Container}>
           <IndexRoute component={MainMenu} />
           <Route path="host" component={Container}>
-            <IndexRoute component={Host} />
+            <IndexRoute component={() => (<Host fb={this.props.fb}/>)} />
           </Route>
           <Route path="join" component={Container}>
             <IndexRoute component={Join} />
