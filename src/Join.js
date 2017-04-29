@@ -15,7 +15,7 @@ const Join = (props) =>
         </Row>
         <Row>
           <Col xs={4} style={{textAlign: 'left'}}><Link to="/">{'\u2329'}</Link></Col>
-          <Col xs={4} style={{textAlign: 'center'}}><h2>Hosting</h2></Col>
+          <Col xs={4} style={{textAlign: 'center'}}><h2>Join</h2></Col>
           <Col xs={4} style={{textAlign: 'right'}}>+</Col>
         </Row>
         <Row>

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { browserHistory } from 'react-router';
 import { Button, FormControl, FormGroup, Modal, Grid, Row, Col } from 'react-bootstrap';
-import hostImage from './../public/images/host.png';
+//import hostImage from './../public/images/host.png';
 import QRImage from './../public/images/QR.png';
 
 const centerBlock = {
@@ -45,6 +45,7 @@ class JoinMenu extends React.Component {
     this.close = this.close.bind(this);
     this.validateTabCode = this.validateTabCode.bind(this);
     this.updateTabCode = this.updateTabCode.bind(this);
+    this.goToJoin = this.goToJoin.bind(this);
   }
 
   open(){
@@ -81,6 +82,11 @@ class JoinMenu extends React.Component {
     return Math.floor(Math.random() * 10000);
   }
 
+  goToJoin(e) {
+    e.preventDefault();
+    browserHistory.push('/join');
+  }
+
   render() {
     return (
     <div className="vertical-center">
@@ -95,9 +101,9 @@ class JoinMenu extends React.Component {
                 <FormControl type="number" step="1" autofocus value={this.state.tabCode} placeholder={this.state.placeHolderCode} onChange={this.updateTabCode} />
                 <FormControl.Feedback />
               </FormGroup>
-                <Button>
+              <Button onClick={this.goToJoin}>
                   OK
-                </Button>
+              </Button>
             </form>
             </Modal.Body>
           </Modal>
