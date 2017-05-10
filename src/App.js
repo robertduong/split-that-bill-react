@@ -20,7 +20,8 @@ class App extends React.Component {
           <Route firebase={this.props.fb} path="host/:action" component={Host}>
           </Route>
           <Route path="join" component={Container}>
-            <IndexRoute component={Join} />
+            <IndexRoute component={MainMenu} />
+            <Route path=":tabCode" firebase={this.props.fb} component={Join} />
             <Route path="option" component={JoinMenu}></Route>
           </Route>
         </Route>

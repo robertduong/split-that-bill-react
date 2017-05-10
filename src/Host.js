@@ -3,8 +3,6 @@ import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Grid, Row, Col } from 'react-bootstrap';
 import QRImage from './../public/images/QR.png';
 
-const tabCode = 123456;
-
 const Header = (props) => 
 <Grid>
       <Row className="header">
@@ -18,8 +16,8 @@ const Header = (props) =>
           <Col xs={4} style={{textAlign: 'right'}}>+</Col>
         </Row>
         <Row>
-          <Col xs={6} style={{textAlign: 'right'}}><h2>Tab Code</h2></Col>
-          <Col xs={6} style={{textAlign: 'left'}}><h2>{tabCode}</h2></Col>
+          <Col xs={6} style={{textAlign: 'right'}}><h2>{props.tabCodeMessage}</h2></Col>
+          <Col xs={6} style={{textAlign: 'left'}}><h2>{props.tabCode}</h2></Col>
         </Row>
         <Row>
           <Col xs={12} style={{textAlign: 'left'}}><img alt={QRImage} className="img-responsive center-block" style={{width: '40%'}} src={QRImage} /></Col>
@@ -33,33 +31,6 @@ const Header = (props) =>
     </Grid>
 
 const names = ["Robert", "Eric", "Alex", "Chesca", "Renee"];
-
-const n =['MARY',
-'PATRICIA',
-'LINDA',
-'BARBARA',
-'ELIZABETH',
-'JENNIFER',
-'MARIA',
-'SUSAN',
-'MARGARET',
-'DOROTHY',
-'LISA',
-'NANCY',
-'KAREN',
-'BETTY',
-'HELEN',
-'SANDRA',
-'DONNA',
-'CAROL',
-'RUTH',
-'SHARON',
-'MICHELLE',
-'LAURA',
-'SARAH',
-'KIMBERLY',
-'DEBORAH',
-'JESSICA'];
 
 const listNames = (names) => names.map((name, idx) => {
   if (idx === 1) {
@@ -78,17 +49,43 @@ class Host extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      members: []
+      members: [],
+      setCode: false,
+      tabCodeMessage: 'Generating...'
     }
   }
 
   componentWillMount() {
-    this.props.route.firebase.ref('members/123456').on('value', (snapshot) => {
-      console.log('Firebase update!');
-      snapshot.val().map((v) => console.log(v));
-      this.setState({members: snapshot.val()});
-     });
+    const tabCodeOrCreate = this.props.params.action || "create";
+    console.log(tabCodeOrCreate);
 
+    if (tabCodeOrCreate === "create") {
+      if (!this.state.tabCode) {
+        this.props.route.firebase.ref('users/0/sessions').limitToLast(1).on('value', (snapshot) => {
+          if (!this.state.setCode) {
+            this.props.route.firebase.ref('users/0/newSession').set(true);
+            this.setState({setCode: true});
+          } else {
+            const key = Object.keys(snapshot.val())[0];
+            this.setState({tabCode: snapshot.val()[key], tabCodeMessage: 'Tab Code'});
+            this.props.route.firebase.ref('users/0/sessions').off();
+          }
+        });
+      }
+    } else {
+      console.log("Tab Code already exists!");
+      this.setState({tabCodeMessage: 'Tab Code'});
+      this.props.route.firebase.ref('members/' + tabCodeOrCreate).on('value', (snapshot) => {
+        console.log('Firebase update!');
+        const members = snapshot.val() || [];
+        console.log(members);
+        this.setState({members: members});
+        members.map((v) => console.log(v));
+      });
+
+      this.setState({tabCode: tabCodeOrCreate}); 
+    }
+    
     console.log(this.state.members);
     console.log(this.props.location);
     console.log(this.props);
@@ -98,7 +95,7 @@ class Host extends React.Component {
   render() {
     return (
       <div className="host">
-        <Header />
+        <Header tabCodeMessage={this.state.tabCodeMessage} tabCode={this.state.tabCode}/>
         <Payments names={this.state.members}/>
       </div>
     );
