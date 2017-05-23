@@ -33,7 +33,7 @@ const MainMenu = (props) =>
         <Col xs={12}><div style={centerBlock}><h3>{headerMessage}</h3></div></Col>
       </Row>
       <Row>
-        <Selection name="HOST" link="/host" imageSrc={hostImage}/>
+        <Selection name="HOST" link="/host/create" imageSrc={hostImage}/>
         <Selection name="JOIN" link="/join/option" imageSrc={joinImage}/>
       </Row>
     </Grid>

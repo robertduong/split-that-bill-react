@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Grid, Row, Col } from 'react-bootstrap';
 import QRImage from './../public/images/QR.png';
+import SplitApi from './SplitApi';
 
 const Header = (props) => 
 <Grid>
@@ -30,8 +31,6 @@ const Header = (props) =>
       </Row>
     </Grid>
 
-const names = ["Robert", "Eric", "Alex", "Chesca", "Renee"];
-
 const listNames = (names) => names.map((name, idx) => {
   if (idx === 1) {
     return <ListGroupItem active>{name}</ListGroupItem>;
@@ -43,6 +42,7 @@ const listNames = (names) => names.map((name, idx) => {
 const Payments = (props) =>
   <ListGroup>
     {listNames(props.names)}
+    {console.log(props.names)}
   </ListGroup>
 
 class Host extends React.Component {
@@ -61,29 +61,41 @@ class Host extends React.Component {
 
     if (tabCodeOrCreate === "create") {
       if (!this.state.tabCode) {
-        this.props.route.firebase.ref('users/0/sessions').limitToLast(1).on('value', (snapshot) => {
-          if (!this.state.setCode) {
-            this.props.route.firebase.ref('users/0/newSession').set(true);
-            this.setState({setCode: true});
-          } else {
-            const key = Object.keys(snapshot.val())[0];
-            this.setState({tabCode: snapshot.val()[key], tabCodeMessage: 'Tab Code'});
-            this.props.route.firebase.ref('users/0/sessions').off();
-          }
+        const createSessionPromise = SplitApi.generateSessionId();
+        createSessionPromise.then((hashid) => {
+          console.log("lets do stuff now with "+hashid);
+          SplitApi.createSession(hashid, 0);
+          this.setState({setCode: true, tabCode: hashid, tabCodeMessage: 'Tab Code'});
+
+          SplitApi.getMembersOnChange(this.state.tabCode, members => {
+            console.log("members: "+members);
+            const memberNames = [];
+            members.map(member => {
+              console.log("fetching member "+member);
+              SplitApi.getUser(member).then(user => {
+                memberNames.push(user.name);
+
+                this.setState({members: memberNames});
+              });
+            });
+
+          });
         });
       }
     } else {
-      console.log("Tab Code already exists!");
-      this.setState({tabCodeMessage: 'Tab Code'});
-      this.props.route.firebase.ref('members/' + tabCodeOrCreate).on('value', (snapshot) => {
-        console.log('Firebase update!');
-        const members = snapshot.val() || [];
-        console.log(members);
-        this.setState({members: members});
-        members.map((v) => console.log(v));
+    console.log("Tab Code already exists!");
+    this.setState({tabCodeMessage: 'Tab Code'});
+    SplitApi.getMembersOnChange(this.state.tabCode || tabCodeOrCreate, members => {
+      const memberNames = [];
+      members.map(member => {
+        SplitApi.getUser(member).then(user => {
+          memberNames.push(user.name);
+          this.setState({members: memberNames});
+        });
       });
+    });
 
-      this.setState({tabCode: tabCodeOrCreate}); 
+      this.setState({tabCode: tabCodeOrCreate});
     }
     
     console.log(this.state.members);

@@ -4,7 +4,7 @@ import { Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
 import QRImage from './../public/images/QR.png';
 
 const listNames = (members) => members.map((member, idx) => {
-  if (member.id === "0") {
+  if (member.id === "1") {
     return <ListGroupItem active>{member.name}</ListGroupItem>;
   } else {
     return <ListGroupItem onClick={console.log("asd")}>{member.name}</ListGroupItem>;
@@ -23,13 +23,23 @@ class Join extends React.Component {
 
   componentWillMount() {
     const tabCode = this.props.params.tabCode || "123";
+    // if tabCode is null, redirect out
     this.props.route.firebase.ref('/members/'+tabCode).on('value', (snapshot) => {
       console.log("Fetching members...");
       // if snpashot.val is null, redirect out
       const membersEntries = Object.entries(snapshot.val());
       const foundSelf = membersEntries.reduce( (found, member) => {
-        return member[1] === "0";
+        return member[1] === "1";
       }, false);
+
+      if (!foundSelf) {
+        const membersRef = this.props.route.firebase.ref('/members/'+tabCode);
+        const membersIndex = membersRef.push();
+        membersRef.update({
+          [membersIndex.key]: "1"
+        });
+
+      }
 
       const updateMembers = [];
       this.setState({members: []});
@@ -38,10 +48,16 @@ class Join extends React.Component {
       console.log("--- Start adding members ---");
       membersEntries.map(memberEntry => {
         this.props.route.firebase.ref('/users/'+memberEntry[1]).once('value').then(snapshot => {
-          this.state.members.push({id: memberEntry[1], name: snapshot.val().name});
-          this.setState({members: this.state.members});
-          console.log("Add member");
-          console.log(this.state.members);
+          const existsInMembers = this.state.members.reduce( (member) => {
+            return memberEntry[1] === member.id;
+          }, false);
+
+          if (!existsInMembers) {
+            this.state.members.push({id: memberEntry[1], name: snapshot.val().name});
+            this.setState({members: this.state.members});
+            console.log("Add member");
+            console.log(this.state.members);
+          }
         });
       });
 

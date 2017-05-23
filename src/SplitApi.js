@@ -1,0 +1,66 @@
+import firebaseDb from './ApiHelper';
+import Hashids from 'hashids';
+
+const hashids = new Hashids("AIzaSyAn04oG-WxLMFRRx38rV58A6GEpSnYvBjgsplit-that-bill", 5, "abcdefghijklmnopqrstuvwxyz0123456789");
+
+const SplitApi = {
+  generateSessionId: () => {
+    const sessionCounterRef = firebaseDb.ref('sessionCounter');
+    return sessionCounterRef.transaction(counter => {
+      if (counter) {
+        counter += 1;
+      }
+      return counter;
+    }).then((result) => {
+      if (result.committed) {
+        const counter = result.snapshot.val();
+        const hashId = hashids.encode(counter);
+        return hashId;
+      }
+    })
+  },
+  createSession: (sessionId, hostId) => {
+    const membersRef = firebaseDb.ref('/members');
+    const membersIndex = membersRef.push();
+    membersRef.update({
+      [sessionId]: {
+        [membersIndex.key]: hostId
+      }
+    });
+
+    const sessionsRef = firebaseDb.ref('/sessions');
+    sessionsRef.update({
+      [sessionId]: {
+        host: hostId
+      }
+    });
+
+    const userSessionsRef = firebaseDb.ref('/users/' + hostId + '/sessions');
+    const userSessionIndex = userSessionsRef.push();
+    userSessionsRef.update({
+      [userSessionIndex.key]: sessionId
+    });
+  },
+  getMembersOnChange: (sessionId, callback) => {
+    const membersRef = firebaseDb.ref('members/' + sessionId);
+    membersRef.on('value', snapshot => {
+      const val = snapshot.val();
+      const members = []
+      for (var p in val) {
+        members.push(val[p]);
+      }
+
+      callback(members);
+    });
+  },
+  getUser: (userId) => {
+    const userRef = firebaseDb.ref('users/' + userId + '/name');
+    return userRef.once('value').then((snapshot) => {
+        console.log("fetched "+snapshot.val());
+        return { name: snapshot.val() };
+      }
+    );
+  }
+}; 
+
+export default SplitApi;

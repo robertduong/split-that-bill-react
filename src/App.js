@@ -5,6 +5,7 @@ import MainMenu from './MainMenu';
 import Host from './Host';
 import Join from './Join';
 import JoinMenu from './JoinMenu';
+import SplitApi from './SplitApi';
 
 
 class App extends React.Component {
