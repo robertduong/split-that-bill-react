@@ -57,9 +57,28 @@ const SplitApi = {
     const userRef = firebaseDb.ref('users/' + userId + '/name');
     return userRef.once('value').then((snapshot) => {
         console.log("fetched "+snapshot.val());
-        return { name: snapshot.val() };
+        return { id: userId, name: snapshot.val() };
       }
     );
+  },
+  addUserToSession: (userId, sessionId) => {
+    const membersRef = firebaseDb.ref('members/' + sessionId);
+    const membersIndex = membersRef.push();
+    membersRef.update({
+      [membersIndex.key]: userId
+    });
+
+    const usersRef = firebaseDb.ref('users/' + userId + '/sessions');
+    const usersIndex = usersRef.push();
+    usersRef.update({
+      [usersIndex.key]: sessionId
+    });
+  },
+  getHost: (sessionId) => {
+    const sessionRef = firebaseDb.ref('sessions/' + sessionId + '/host');
+    return sessionRef.once('value').then(snapshot => {
+      return snapshot.val(); 
+    });
   }
 }; 
 
