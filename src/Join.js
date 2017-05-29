@@ -12,7 +12,7 @@ const listNames = (members, host) => members.map((member, idx) => {
     }
   });
 
-const Payments = (props) => <ListGroup>{listNames(props.members, props.host)}</ListGroup>
+const Payments = (props) => <ListGroup></ListGroup>
 
 const centerBlock = {
   textAlign: 'center',
@@ -33,7 +33,10 @@ const ShowModal = (props) =>
           <FormControl type="number" autoFocus value={props.paymentAmount} onChange={props.onChange} placeholder={"$26"} />
         </FormGroup>
         <Button onClick={props.pay}>
-          Pay
+          Pay Amount
+        </Button>
+        <Button onClick={props.pay}>
+          Pay Evenly ($12)
         </Button>
       </form>
     </Modal.Body>
@@ -145,19 +148,16 @@ class Join extends React.Component {
             </Row>
             <Row>
               <Col xs={4} style={{textAlign: 'left'}}><Link to="/">{'\u2329'}</Link></Col>
-              <Col xs={4} style={{textAlign: 'center'}}><h2>Join</h2></Col>
-              <Col xs={4} style={{textAlign: 'right'}}>+</Col>
+              <Col xs={4} style={{textAlign: 'center'}}><h2>Paying</h2></Col>
             </Row>
-            <Row>
+            {/*<Row>
               <Col xs={6} style={{textAlign: 'right'}}><h2>Tab Code</h2></Col>
               <Col xs={6} style={{textAlign: 'left'}}><h2>{this.props.params.tabCode}</h2></Col>
-            </Row>
+            </Row>*/}
             <Row>
-              <Col xs={12} style={{textAlign: 'left'}}><img className="img-responsive center-block" style={{width: '40%'}} src={QRImage} /></Col>
             </Row>
-            <Row>
-              <Col xs={12} style={{textAlign: 'center'}} onClick={this.open}>Pay {this.state.host.name}</Col>
-            </Row>
+            <Row> <Col xs={12} style={{textAlign: 'center'}}>Total: $26</Col> </Row>
+            <Row> <Col xs={12} style={{textAlign: 'center'}} onClick={this.open}>Pay {this.state.host.name}</Col> </Row>
             </div>
           </Row>
         </Grid>

@@ -21,11 +21,10 @@ const Header = (props) =>
           <Col xs={6} style={{textAlign: 'left'}}><h2>{props.tabCode}</h2></Col>
         </Row>
         <Row>
-          <Col xs={12} style={{textAlign: 'left'}}><img alt={QRImage} className="img-responsive center-block" style={{width: '40%'}} src={QRImage} /></Col>
         </Row>
         <Row>
-          <Col xs={6} style={{textAlign: 'center'}}>Scan Receipt</Col>
-          <Col xs={6} style={{textAlign: 'center'}}>Add Total</Col>
+          {/*<Col xs={6} style={{textAlign: 'center'}}>Scan Receipt</Col>*/}
+          <Col xs={12} style={{textAlign: 'center'}}>Add Bill Total</Col>
         </Row>
         </div>
       </Row>

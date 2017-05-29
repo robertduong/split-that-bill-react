@@ -1,8 +1,6 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
-import { Button, FormControl, FormGroup, Modal, Grid, Row, Col } from 'react-bootstrap';
-//import hostImage from './../public/images/host.png';
-import QRImage from './../public/images/QR.png';
+import { Button, FormControl, FormGroup, Modal, Col } from 'react-bootstrap';
 
 const centerBlock = {
   textAlign: 'center',
@@ -12,7 +10,7 @@ const centerBlock = {
 }
 
 const Selection = (props) =>
-  <Col xs={6}>
+  <Col xs={12}>
     <div style={centerBlock} onClick={props.onClick}>
       <img className="img-responsive"  alt={props.imageSrc} src={props.imageSrc}/>
       {props.name}
@@ -32,37 +30,35 @@ const modalStyle = {
 const availableTabCodes = ['1483', '1927', '4584']
 
 class JoinMenu extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      showTabCodeModal: false,
+      showTabCodeModal: this.props.showModal,
       tabCode: '',
       placeHolderCode: this.randomTab()
     };
 
     this.showTabCodeModal = this.showTabCodeModal.bind(this);
-    this.open = this.open.bind(this);
-    this.close = this.close.bind(this);
     this.validateTabCode = this.validateTabCode.bind(this);
     this.updateTabCode = this.updateTabCode.bind(this);
     this.goToJoin = this.goToJoin.bind(this);
   }
 
-  open(){
+    /*open(){
   this.setState(prevState => ({
       showTabCodeModal: true
     }));
-  }
+  }*/
 
-  close(){
+    /*close(){
   this.setState(prevState => ({
       showTabCodeModal: false
     }));
-  }
+  }*/
 
   showTabCodeModal(e) {
     e.preventDefault();
-    this.open();
+    this.props.open();
   }
 
   validateTabCode() {
@@ -89,35 +85,23 @@ class JoinMenu extends React.Component {
 
   render() {
     return (
-    <div className="vertical-center">
-        <div className="tab-code-modal">
-          <Modal style={modalStyle} show={this.state.showTabCodeModal} onHide={this.close}>
+          <Modal style={modalStyle} show={this.props.showModal} onHide={this.props.close}>
+          {console.log(this.props.showModal)}
             <Modal.Header closeButton>
               <Modal.Title>Enter Tab Code</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <form>
-              <FormGroup controlId="formBasicText" validationState={this.validateTabCode()}>
-                <FormControl type="number" step="1" autofocus value={this.state.tabCode} placeholder={this.state.placeHolderCode} onChange={this.updateTabCode} />
+              <FormGroup controlId="formBasicText">
+                <FormControl type="string" step="1" autoFocus value={this.props.value} placeholder={this.state.placeHolderCode} onChange={this.props.updateValue} />
                 <FormControl.Feedback />
               </FormGroup>
-              <Button onClick={this.goToJoin}>
-                  OK
+              <Button onClick={this.props.confirm}>
+                Join
               </Button>
             </form>
             </Modal.Body>
           </Modal>
-        </div> 
-      <Grid>
-        <Row className="show-grid">
-          <Col xs={12}><div style={centerBlock}><h3>JOIN SESSION</h3></div></Col>
-        </Row>
-        <Row>
-          <Selection name="QR" imageSrc={QRImage}/>
-          <Selection name="Enter Tab Code" onClick={this.showTabCodeModal} imageSrc={QRImage}/>
-        </Row>
-      </Grid>
-    </div>
     );
   }
 }

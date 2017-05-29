@@ -41,6 +41,18 @@ const SplitApi = {
       [userSessionIndex.key]: sessionId
     });
   },
+  sessionExist: (sessionId) => {
+    if (sessionId == null || sessionId === "") {
+      return new Promise((resolve, reject) => {
+        resolve(true);
+      });
+    } else {
+    const sessionRef = firebaseDb.ref('/sessions/' + sessionId);
+      return sessionRef.once('value').then((snapshot) => {
+        return snapshot.exists();
+      });
+    }
+  },
   getMembersOnChange: (sessionId, callback) => {
     const membersRef = firebaseDb.ref('members/' + sessionId);
     membersRef.on('value', snapshot => {
