@@ -84,7 +84,7 @@ class MainMenu extends React.Component {
       if (!exist) {
         this.setState({invalidTabCode: true, showErrorModal: true, showModal: false});
       } else {
-        browserHistory.push('/join/'+this.tabCode);
+        browserHistory.push('/join/'+tabCode);
       }
     });
   }
