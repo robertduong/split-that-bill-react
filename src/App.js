@@ -6,6 +6,7 @@ import Host from './Host';
 import Join from './Join';
 import JoinMenu from './JoinMenu';
 import SplitApi from './SplitApi';
+import Login from './Login';
 
 
 class App extends React.Component {
@@ -17,9 +18,10 @@ class App extends React.Component {
     return (
       <Router history={browserHistory}> 
         <Route path="/" component={Container}>
-          <IndexRoute component={MainMenu} />
-          <Route firebase={this.props.fb} path="host/:action" component={Host}>
-          </Route>
+          <IndexRoute firebase={this.props.fb} component={Login} />
+          <Route firebase={this.props.fb} path="menu" component={MainMenu} />
+          <Route firebase={this.props.fb} path="host/:action" component={Host} />
+
           <Route path="join" component={Container}>
             <IndexRoute component={MainMenu} />
             <Route path=":tabCode" firebase={this.props.fb} component={Join} />

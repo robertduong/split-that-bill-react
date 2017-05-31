@@ -5,6 +5,8 @@ import hostImage from './../public/images/host.png';
 import joinImage from './../public/images/join.png';
 import JoinMenu from './JoinMenu';
 import SplitApi from './SplitApi';
+import {firebaseAuth} from './ApiHelper';
+import {authConfig} from './ApiHelper';
 
 const headerMessage = "GET STARTED";
 
@@ -96,6 +98,7 @@ class MainMenu extends React.Component {
 
   render() {
     return (
+      <div>
       <div className="vertical-center">
         <JoinMenu close={this.closeModal} value={this.state.tabCode} updateValue={this.updateTabCode} open={this.openModal} confirm={this.goToJoin} validate={this.validateTabCode} showModal={this.state.showModal}/>
         <TabCodeInvalidModal showErrorModal={this.state.showErrorModal} close={this.closeErrorModal} tabCode={this.state.tabCode}/>
@@ -109,6 +112,7 @@ class MainMenu extends React.Component {
           </Row>
         </Grid>
       </div>
+    </div>
     );
   }
 }

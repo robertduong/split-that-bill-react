@@ -1,4 +1,4 @@
-import firebaseDb from './ApiHelper';
+import { db as firebaseDb, ui as firebaseUi }  from './ApiHelper';
 import Hashids from 'hashids';
 
 const hashids = new Hashids("AIzaSyAn04oG-WxLMFRRx38rV58A6GEpSnYvBjgsplit-that-bill", 5, "abcdefghijklmnopqrstuvwxyz0123456789");
