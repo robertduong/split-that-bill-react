@@ -7,7 +7,7 @@ import JoinMenu from './JoinMenu';
 import SplitApi from './SplitApi';
 import {firebaseAuthUI as firebaseAuth} from './ApiHelper';
 import {authConfig} from './ApiHelper';
-import {firebaseApp} from './ApiHelper';
+import {firebaseAppAuth} from './ApiHelper';
 
 const headerMessage = "GET STARTED";
 
@@ -29,14 +29,13 @@ const centerModal = {
 class Login extends React.Component {
   constructor() {
     super();
-    console.log("yes");
  }
 
   componentWillMount() {
     console.log("mounted");
-    console.log(firebaseApp.auth());
-    firebaseApp.auth().onAuthStateChanged((user) => {
+    firebaseAppAuth.onAuthStateChanged((user) => {
       console.log(user);
+      //browserHistory.push('/menu');
     });
   }
 

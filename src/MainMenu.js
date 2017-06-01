@@ -6,7 +6,9 @@ import joinImage from './../public/images/join.png';
 import JoinMenu from './JoinMenu';
 import SplitApi from './SplitApi';
 import {firebaseAuth} from './ApiHelper';
+import {firebaseAppAuth} from './ApiHelper';
 import {authConfig} from './ApiHelper';
+import * as firebase from 'firebase';
 
 const headerMessage = "GET STARTED";
 
@@ -61,6 +63,8 @@ class MainMenu extends React.Component {
     this.updateTabCode = this.updateTabCode.bind(this);
     this.goToJoin = this.goToJoin.bind(this);
     this.closeErrorModal = this.closeErrorModal.bind(this);
+
+    console.log(firebaseAppAuth.currentUser);
   }
 
   openModal(e) {

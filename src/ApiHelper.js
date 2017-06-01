@@ -12,6 +12,7 @@ const config = {
 
 export const firebaseApp = firebase.initializeApp(config);
 export const firebaseDb = firebaseApp.database();
+export const firebaseAppAuth = firebaseApp.auth();
 export const firebaseAuthUI = new firebaseui.auth.AuthUI(firebase.auth());
 export const authConfig = {
         // Url to redirect to after a successful sign-in.
@@ -19,10 +20,7 @@ export const authConfig = {
         'callbacks': {
           'signInSuccess': function(user, credential, redirectUrl) {
             console.log("sign in success");
-            console.log(user);
-            console.log(credential);
-            console.log(redirectUrl);
-            return false; 
+            return true; 
           }
         },
         'signInOptions': [
