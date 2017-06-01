@@ -1,4 +1,4 @@
-import { db as firebaseDb, ui as firebaseUi }  from './ApiHelper';
+import { firebaseDb, ui as firebaseUi }  from './ApiHelper';
 import Hashids from 'hashids';
 
 const hashids = new Hashids("AIzaSyAn04oG-WxLMFRRx38rV58A6GEpSnYvBjgsplit-that-bill", 5, "abcdefghijklmnopqrstuvwxyz0123456789");
@@ -54,7 +54,7 @@ const SplitApi = {
     }
   },
   getMembersOnChange: (sessionId, callback) => {
-    const membersRef = firebaseDb.ref('members/' + sessionId);
+    const membersRef = firebaseDb.ref('/members/' + sessionId);
     membersRef.on('value', snapshot => {
       const val = snapshot.val();
       const members = []
@@ -63,6 +63,13 @@ const SplitApi = {
       }
 
       callback(members);
+    });
+  },
+  createUser: (userId, name, email) => {
+    const userRef = firebaseDb.ref('users/'+userId);
+    userRef.update({
+      name: name,
+      email: email
     });
   },
   getUser: (userId) => {
@@ -91,7 +98,7 @@ const SplitApi = {
     return sessionRef.once('value').then(snapshot => {
       return snapshot.val(); 
     });
-  }
+  },
 }; 
 
 export default SplitApi;

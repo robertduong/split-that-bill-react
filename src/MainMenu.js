@@ -9,6 +9,7 @@ import {firebaseAuth} from './ApiHelper';
 import {firebaseAppAuth} from './ApiHelper';
 import {authConfig} from './ApiHelper';
 import * as firebase from 'firebase';
+import {login} from './actions';
 
 const headerMessage = "GET STARTED";
 
@@ -48,8 +49,8 @@ const TabCodeInvalidModal = (props) =>
 
 
 class MainMenu extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       showModal: false,
       tabCode: '',
@@ -64,7 +65,13 @@ class MainMenu extends React.Component {
     this.goToJoin = this.goToJoin.bind(this);
     this.closeErrorModal = this.closeErrorModal.bind(this);
 
-    console.log(firebaseAppAuth.currentUser);
+     firebaseAppAuth.onAuthStateChanged((user) => {
+       this.props.route.store.dispatch(login(user));
+       console.log(this.getStoreState().user.displayName);
+       this.forceUpdate();
+       console.log("authed already...");
+    });
+     console.log(this.props.route.store.getState());
   }
 
   openModal(e) {
@@ -82,6 +89,10 @@ class MainMenu extends React.Component {
 
   updateTabCode(e) {
     this.setState({tabCode: e.target.value });
+  }
+
+  getStoreState() {
+    return this.props.route.store.getState();
   }
 
   goToJoin() {
@@ -107,6 +118,9 @@ class MainMenu extends React.Component {
         <JoinMenu close={this.closeModal} value={this.state.tabCode} updateValue={this.updateTabCode} open={this.openModal} confirm={this.goToJoin} validate={this.validateTabCode} showModal={this.state.showModal}/>
         <TabCodeInvalidModal showErrorModal={this.state.showErrorModal} close={this.closeErrorModal} tabCode={this.state.tabCode}/>
         <Grid>
+          <Row className="show-grid">
+            <Col xs={12}><div style={centerBlock}><h3>Welcome {this.getStoreState().user.displayName}</h3></div></Col>
+          </Row>
           <Row className="show-grid">
             <Col xs={12}><div style={centerBlock}><h3>{headerMessage}</h3></div></Col>
           </Row>

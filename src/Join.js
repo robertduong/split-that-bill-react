@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 import { Button, FormControl, FormGroup, Modal, Grid, Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
 import QRImage from './../public/images/QR.png';
 import SplitApi from './SplitApi';
+import {firebaseAppAuth} from './ApiHelper';
+import {login} from './actions';
 
 const listNames = (members, host) => members.map((member, idx) => {
   if (member.id === host.id) {
@@ -67,6 +69,13 @@ class Join extends React.Component {
       amount: 0
     };
 
+   firebaseAppAuth.onAuthStateChanged((user) => {
+       this.props.route.store.dispatch(login(user));
+       console.log(this.getStoreState().user.displayName);
+       this.forceUpdate();
+       console.log("authed already...");
+    });
+
     this.close = this.close.bind(this);
     this.open = this.open.bind(this);
     this.pay = this.pay.bind(this);
@@ -90,11 +99,11 @@ class Join extends React.Component {
       console.log("Fetching members...");
       
       const foundSelf = members.reduce((found, member) => {
-        return member === "1";
+        return member === this.props.route.store.getState().user.uid;
       }, false);
 
       if (!foundSelf) {
-        SplitApi.addUserToSession("1", tabCode);
+        SplitApi.addUserToSession(this.props.route.store.getState().user.uid, tabCode);
       }
 
       const memberNames = []; members.map(member => {

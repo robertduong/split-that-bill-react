@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 import { ListGroup, ListGroupItem, Grid, Row, Col } from 'react-bootstrap';
 import QRImage from './../public/images/QR.png';
 import SplitApi from './SplitApi';
+import {firebaseAppAuth} from './ApiHelper';
+import {login} from './actions';
 
 const Header = (props) => 
 <Grid>
@@ -52,6 +54,15 @@ class Host extends React.Component {
       setCode: false,
       tabCodeMessage: 'Generating...'
     }
+
+     firebaseAppAuth.onAuthStateChanged((user) => {
+       this.props.route.store.dispatch(login(user));
+       console.log(this.getStoreState().user.displayName);
+       this.forceUpdate();
+       console.log("authed already...");
+    });
+ 
+    console.log(this.props.route.store.getState().user.displayName);
   }
 
   componentWillMount() {
@@ -63,7 +74,7 @@ class Host extends React.Component {
         const createSessionPromise = SplitApi.generateSessionId();
         createSessionPromise.then((hashid) => {
           console.log("lets do stuff now with "+hashid);
-          SplitApi.createSession(hashid, 0);
+          SplitApi.createSession(hashid, this.props.route.store.getState().user.uid);
           this.setState({setCode: true, tabCode: hashid, tabCodeMessage: 'Tab Code'});
 
           SplitApi.getMembersOnChange(this.state.tabCode, members => {

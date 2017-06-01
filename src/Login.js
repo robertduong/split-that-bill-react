@@ -8,6 +8,8 @@ import SplitApi from './SplitApi';
 import {firebaseAuthUI as firebaseAuth} from './ApiHelper';
 import {authConfig} from './ApiHelper';
 import {firebaseAppAuth} from './ApiHelper';
+import {login} from './actions';
+
 
 const headerMessage = "GET STARTED";
 
@@ -27,20 +29,26 @@ const centerModal = {
 }
 
 class Login extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
  }
 
   componentWillMount() {
     console.log("mounted");
     firebaseAppAuth.onAuthStateChanged((user) => {
-      console.log(user);
-      //browserHistory.push('/menu');
+      this.props.route.store.dispatch(login(user));
     });
   }
 
   componentDidMount(){
-    console.log(authConfig);
+    console.log(this.props.store);
+    authConfig.callbacks.signInSuccess = (user, credential, redirectUrl) => {
+      this.props.route.store.dispatch(login(user));
+      SplitApi.createUser(user.uid, user.displayName, user.email);
+      browserHistory.push('/menu');
+      return false;
+    };
+    console.log(authConfig.callbacks.signInSuccess);
     firebaseAuth.start('#auth-area', authConfig);
   }
 
