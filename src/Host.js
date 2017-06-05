@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 import { ListGroup, ListGroupItem, Grid, Row, Col } from 'react-bootstrap';
 import QRImage from './../public/images/QR.png';
 import SplitApi from './SplitApi';
 import {firebaseAppAuth} from './ApiHelper';
 import {login} from './actions';
+import HostIcon from './../public/images/crown.svg';
 
 const Header = (props) => 
 <Grid>
@@ -14,7 +15,7 @@ const Header = (props) =>
           <Col xs={12}></Col>
         </Row>
         <Row>
-          <Col xs={4} style={{textAlign: 'left'}}><Link to="/">{'\u2329'}</Link></Col>
+          <Col xs={4} style={{textAlign: 'left'}}><Link to="/menu">{'\u2329'}</Link></Col>
           <Col xs={4} style={{textAlign: 'center'}}><h2>Hosting</h2></Col>
           <Col xs={4} style={{textAlign: 'right'}}>+</Col>
         </Row>
@@ -32,18 +33,37 @@ const Header = (props) =>
       </Row>
     </Grid>
 
-const listNames = (names) => names.map((name, idx) => {
-  if (idx === 1) {
-    return <ListGroupItem active>{name}</ListGroupItem>;
+const listNames = (users, hostId, hostIcon) => users.map((user, idx) => {
+  if (user.uid === hostId) {
+    console.log("User.uid"+user.uid);
+    console.log("Host.uid"+hostId);
+    return (
+      <ListGroupItem>
+        <Grid>
+          <Row>
+            <Col xs={10}>{user.name}</Col>
+            <Col xs={2}><img src={hostIcon} /></Col>
+          </Row>
+        </Grid>
+      </ListGroupItem>
+    );
   } else {
-    return <ListGroupItem onClick={console.log("asd")}>{name}</ListGroupItem>;
+    return (
+      <ListGroupItem>
+        <Grid>
+          <Row>
+            <Col xs={10}>{user.name}</Col>
+            <Col xs={2}>PAID</Col>
+          </Row>
+        </Grid>
+      </ListGroupItem>
+    );
     }
   });
 
 const Payments = (props) =>
   <ListGroup>
-    {listNames(props.names)}
-    {console.log(props.names)}
+    {listNames(props.users, props.host.uid, props.hostIcon)}
   </ListGroup>
 
 class Host extends React.Component {
@@ -52,17 +72,23 @@ class Host extends React.Component {
     this.state = {
       members: [],
       setCode: false,
-      tabCodeMessage: 'Generating...'
+      tabCodeMessage: 'Generating...',
+      host: this.getStoreState().user
     }
 
      firebaseAppAuth.onAuthStateChanged((user) => {
        this.props.route.store.dispatch(login(user));
-       console.log(this.getStoreState().user.displayName);
+       this.setState({host: this.getStoreState().user});
        this.forceUpdate();
        console.log("authed already...");
     });
  
+    console.log("Host "+this.state.host);
     console.log(this.props.route.store.getState().user.displayName);
+  }
+
+  getStoreState() {
+    return this.props.route.store.getState();
   }
 
   componentWillMount() {
@@ -75,6 +101,9 @@ class Host extends React.Component {
         createSessionPromise.then((hashid) => {
           console.log("lets do stuff now with "+hashid);
           SplitApi.createSession(hashid, this.props.route.store.getState().user.uid);
+
+          browserHistory.push('/host/'+hashid);
+
           this.setState({setCode: true, tabCode: hashid, tabCodeMessage: 'Tab Code'});
 
           SplitApi.getMembersOnChange(this.state.tabCode, members => {
@@ -83,7 +112,7 @@ class Host extends React.Component {
             members.map(member => {
               console.log("fetching member "+member);
               SplitApi.getUser(member).then(user => {
-                memberNames.push(user.name);
+                memberNames.push({uid: user.id, name: user.name});
 
                 this.setState({members: memberNames});
               });
@@ -99,7 +128,7 @@ class Host extends React.Component {
       const memberNames = [];
       members.map(member => {
         SplitApi.getUser(member).then(user => {
-          memberNames.push(user.name);
+          memberNames.push({uid: user.id, name: user.name});
           this.setState({members: memberNames});
         });
       });
@@ -118,7 +147,7 @@ class Host extends React.Component {
     return (
       <div className="host">
         <Header tabCodeMessage={this.state.tabCodeMessage} tabCode={this.state.tabCode}/>
-        <Payments names={this.state.members}/>
+        <Payments hostIcon={HostIcon} host={this.state.host} users={this.state.members}/>
       </div>
     );
   }

@@ -28,23 +28,36 @@ const centerModal = {
   color: '#000'
 }
 
+const convertFirebaseUsertoStore = (firebaseUser) => {
+  return {
+    displayName: firebaseUser.displayName,
+    uid: firebaseUser.uid,
+    email: firebaseUser.email
+  }
+}
+
 class Login extends React.Component {
   constructor(props) {
     super(props);
- }
+
+    firebaseAppAuth.onAuthStateChanged((firebaseUser) => {
+      const storeUser = convertFirebaseUsertoStore(firebaseUser);
+      this.props.route.store.dispatch(login(storeUser));
+      browserHistory.push('/menu');
+    });
+  }
 
   componentWillMount() {
     console.log("mounted");
-    firebaseAppAuth.onAuthStateChanged((user) => {
-      this.props.route.store.dispatch(login(user));
-    });
   }
 
   componentDidMount(){
     console.log(this.props.store);
-    authConfig.callbacks.signInSuccess = (user, credential, redirectUrl) => {
-      this.props.route.store.dispatch(login(user));
-      SplitApi.createUser(user.uid, user.displayName, user.email);
+    authConfig.callbacks.signInSuccess = (firebaseUser, credential, redirectUrl) => {
+      const storeUser = convertFirebaseUsertoStore(firebaseUser);
+
+      this.props.route.store.dispatch(login(storeUser));
+      SplitApi.createUser(storeUser.uid, storeUser.displayName, storeUser.email);
       browserHistory.push('/menu');
       return false;
     };

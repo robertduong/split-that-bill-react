@@ -42,14 +42,19 @@ const SplitApi = {
     });
   },
   sessionExist: (sessionId) => {
+    return this.getSession(sessionId).then(snapshot => {
+      return snapshot == null;
+    });
+  },
+  getSession: (sessionId) => {
     if (sessionId == null || sessionId === "") {
       return new Promise((resolve, reject) => {
         resolve(true);
       });
     } else {
-    const sessionRef = firebaseDb.ref('/sessions/' + sessionId);
+      const sessionRef = firebaseDb.ref('/sessions/' + sessionId);
       return sessionRef.once('value').then((snapshot) => {
-        return snapshot.exists();
+        return snapshot.val();
       });
     }
   },

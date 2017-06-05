@@ -9,7 +9,7 @@ import {firebaseAuth} from './ApiHelper';
 import {firebaseAppAuth} from './ApiHelper';
 import {authConfig} from './ApiHelper';
 import * as firebase from 'firebase';
-import {login} from './actions';
+import {login, logout} from './actions';
 
 const headerMessage = "GET STARTED";
 
@@ -56,7 +56,7 @@ class MainMenu extends React.Component {
       tabCode: '',
       showErrorModal: false,
       invalidTabCode: false,
-      loadingValidation: false
+      loadingValidation: false,
   }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -64,14 +64,29 @@ class MainMenu extends React.Component {
     this.updateTabCode = this.updateTabCode.bind(this);
     this.goToJoin = this.goToJoin.bind(this);
     this.closeErrorModal = this.closeErrorModal.bind(this);
+    this.signOut = this.signOut.bind(this);
 
-     firebaseAppAuth.onAuthStateChanged((user) => {
-       this.props.route.store.dispatch(login(user));
-       console.log(this.getStoreState().user.displayName);
-       this.forceUpdate();
-       console.log("authed already...");
+   console.log(this.props.route.store.getState());
+  }
+
+  componentWillMount() {
+   firebaseAppAuth.onAuthStateChanged((user) => {
+       if (user) {
+         console.log("authed already...");
+         this.props.route.store.dispatch(login(user));
+       } else {
+         console.log('logged out');
+         this.props.route.store.dispatch(logout()); 
+         browserHistory.push('/');
+       }
     });
-     console.log(this.props.route.store.getState());
+  }
+
+  signOut(e) {
+    e.preventDefault();
+    firebaseAppAuth.signOut().then(() => {
+      //browserHistory.push('/');
+    });
   }
 
   openModal(e) {
@@ -96,12 +111,17 @@ class MainMenu extends React.Component {
   }
 
   goToJoin() {
-    const tabCode = this.state.tabCode
-    SplitApi.sessionExist(tabCode).then((exist) => {
-      if (!exist) {
+    const tabCode = this.state.tabCode.toLowerCase();
+    SplitApi.getSession(tabCode).then((val) => {
+      if (!val) {
         this.setState({invalidTabCode: true, showErrorModal: true, showModal: false});
       } else {
-        browserHistory.push('/join/'+tabCode);
+        //if the user is the host
+        if (val.host === this.getStoreState().user.uid) {
+          browserHistory.push('/host/'+tabCode);
+        } else {
+          browserHistory.push('/join/'+tabCode);
+        }
       }
     });
   }
@@ -114,6 +134,7 @@ class MainMenu extends React.Component {
   render() {
     return (
       <div>
+        {/*<a onClick={this.signOut}>Sign Out</a>*/}
       <div className="vertical-center">
         <JoinMenu close={this.closeModal} value={this.state.tabCode} updateValue={this.updateTabCode} open={this.openModal} confirm={this.goToJoin} validate={this.validateTabCode} showModal={this.state.showModal}/>
         <TabCodeInvalidModal showErrorModal={this.state.showErrorModal} close={this.closeErrorModal} tabCode={this.state.tabCode}/>

@@ -5,16 +5,38 @@ import QRImage from './../public/images/QR.png';
 import SplitApi from './SplitApi';
 import {firebaseAppAuth} from './ApiHelper';
 import {login} from './actions';
+import HostIcon from './../public/images/crown.svg';
 
-const listNames = (members, host) => members.map((member, idx) => {
-  if (member.id === host.id) {
-    return <ListGroupItem active>{member.name}</ListGroupItem>;
+const listNames = (members, host, hostIcon) => members.map((user, idx) => {
+  if (user.uid === host.id) {
+     return (
+      <ListGroupItem>
+        <Grid>
+          <Row>
+            <Col xs={10}>{user.name}</Col>
+            <Col xs={2}><img src={hostIcon} /></Col>
+          </Row>
+        </Grid>
+      </ListGroupItem>
+    );
   } else {
-    return <ListGroupItem onClick={console.log("asd")}>{member.name}</ListGroupItem>;
-    }
+    return (
+      <ListGroupItem>
+        <Grid>
+          <Row>
+            <Col xs={10}>{user.name}</Col>
+            <Col xs={2}>PAID</Col>
+          </Row>
+        </Grid>
+      </ListGroupItem>
+    );
+  }
   });
 
-const Payments = (props) => <ListGroup></ListGroup>
+const Payments = (props) => 
+  <ListGroup>
+    {listNames(props.members, props.host, props.hostIcon)}
+  </ListGroup>
 
 const centerBlock = {
   textAlign: 'center',
@@ -69,7 +91,7 @@ class Join extends React.Component {
       amount: 0
     };
 
-   firebaseAppAuth.onAuthStateChanged((user) => {
+    firebaseAppAuth.onAuthStateChanged((user) => {
        this.props.route.store.dispatch(login(user));
        console.log(this.getStoreState().user.displayName);
        this.forceUpdate();
@@ -81,6 +103,10 @@ class Join extends React.Component {
     this.pay = this.pay.bind(this);
     this.onPaymentConfirmClose = this.onPaymentConfirmClose.bind(this);
     this.onPaymentChange = this.onPaymentChange.bind(this);
+  }
+
+  getStoreState() {
+    return this.props.route.store.getState();
   }
 
   componentWillMount() {
@@ -106,9 +132,10 @@ class Join extends React.Component {
         SplitApi.addUserToSession(this.props.route.store.getState().user.uid, tabCode);
       }
 
-      const memberNames = []; members.map(member => {
+      const memberNames = []; 
+      members.map(member => {
         SplitApi.getUser(member).then(user => {
-          memberNames.push(user);
+          memberNames.push({uid: user.id, name: user.name});
           this.setState({members: memberNames});
         });
       });
@@ -156,8 +183,8 @@ class Join extends React.Component {
               <Col xs={12}></Col>
             </Row>
             <Row>
-              <Col xs={4} style={{textAlign: 'left'}}><Link to="/">{'\u2329'}</Link></Col>
-              <Col xs={4} style={{textAlign: 'center'}}><h2>Paying</h2></Col>
+              <Col xs={4} style={{textAlign: 'left'}}><Link to="/menu">{'\u2329'}</Link></Col>
+              <Col xs={4} style={{textAlign: 'center'}}><h2>Total: $26</h2></Col>
             </Row>
             {/*<Row>
               <Col xs={6} style={{textAlign: 'right'}}><h2>Tab Code</h2></Col>
@@ -165,12 +192,11 @@ class Join extends React.Component {
             </Row>*/}
             <Row>
             </Row>
-            <Row> <Col xs={12} style={{textAlign: 'center'}}>Total: $26</Col> </Row>
             <Row> <Col xs={12} style={{textAlign: 'center'}} onClick={this.open}>Pay {this.state.host.name}</Col> </Row>
             </div>
           </Row>
         </Grid>
-        <Payments host={this.state.host} members={this.state.members}/>
+        <Payments hostIcon={HostIcon} host={this.state.host} members={this.state.members} />
       </div>
     );
   }

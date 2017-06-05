@@ -62,7 +62,7 @@ class JoinMenu extends React.Component {
   }
 
   validateTabCode() {
-    if (availableTabCodes.includes(this.state.tabCode)) {
+    if (availableTabCodes.includes(this.state.tabCode.toLowerCase())) {
       console.log('success');
       return 'success';
     } else {
