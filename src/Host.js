@@ -143,6 +143,11 @@ class Host extends React.Component {
     console.log(this.props.params);
   }
 
+  componentWillUnmount() {
+    console.log("unmounting");
+    SplitApi.stopGetMembers(this.state.tabCode|| this.props.params.action || "create"); 
+  }
+
   render() {
     return (
       <div className="host">

@@ -58,6 +58,9 @@ const SplitApi = {
       });
     }
   },
+  stopGetMembers: (sessionId) => {
+    firebaseDb.ref('/members/' + sessionId).off();
+  },
   getMembersOnChange: (sessionId, callback) => {
     const membersRef = firebaseDb.ref('/members/' + sessionId);
     membersRef.on('value', snapshot => {

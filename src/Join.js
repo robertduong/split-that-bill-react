@@ -125,7 +125,7 @@ class Join extends React.Component {
       console.log("Fetching members...");
       
       const foundSelf = members.reduce((found, member) => {
-        return member === this.props.route.store.getState().user.uid;
+        return found || member === this.props.route.store.getState().user.uid;
       }, false);
 
       if (!foundSelf) {
@@ -142,11 +142,17 @@ class Join extends React.Component {
 
     });
 
+
     //get list of members
     //check if current user is there
     //if not, add to list
     //get members
     //set members in state
+  }
+
+  componentWillUnmount() {
+    console.log("unmounting");
+    SplitApi.stopGetMembers(this.props.params.tabCode); 
   }
 
   close() {
