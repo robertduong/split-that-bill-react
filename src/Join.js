@@ -88,7 +88,9 @@ class Join extends React.Component {
       host: {id: "", name: ""},
       showModal: false,
       showPaymentConfirmModal: false,
-      amount: 0
+      amount: 0,
+      total: 0,
+      tabCode: ''
     };
 
     firebaseAppAuth.onAuthStateChanged((user) => {
@@ -112,10 +114,17 @@ class Join extends React.Component {
   componentWillMount() {
 
     const tabCode = this.props.params.tabCode || "123";
+    this.setState({tabCode: tabCode});
     // if tabCode is null, redirect out
     //
 
-    SplitApi.getHost(tabCode).then(host => {
+    SplitApi.getTotalOnChange(tabCode, (totalAmount) => {
+      this.setState({total: totalAmount});
+    });
+
+    SplitApi.getSession(tabCode).then(session => {
+      const host = session.host;
+      console.log(session.total);
       return SplitApi.getUser(host)
     }).then(userDetails => {
       this.setState({host: userDetails});
@@ -153,6 +162,7 @@ class Join extends React.Component {
   componentWillUnmount() {
     console.log("unmounting");
     SplitApi.stopGetMembers(this.props.params.tabCode); 
+    SplitApi.stopGetTotal(this.state.tabCode || this.props.param.action);
   }
 
   close() {
@@ -190,7 +200,7 @@ class Join extends React.Component {
             </Row>
             <Row>
               <Col xs={4} style={{textAlign: 'left'}}><Link to="/menu">{'\u2329'}</Link></Col>
-              <Col xs={4} style={{textAlign: 'center'}}><h2>Total: $26</h2></Col>
+              <Col xs={4} style={{textAlign: 'center'}}><h4>Tab Code</h4><h2>{this.state.tabCode}</h2></Col>
             </Row>
             {/*<Row>
               <Col xs={6} style={{textAlign: 'right'}}><h2>Tab Code</h2></Col>
@@ -203,6 +213,7 @@ class Join extends React.Component {
           </Row>
         </Grid>
         <Payments hostIcon={HostIcon} host={this.state.host} members={this.state.members} />
+        <div style={{textAlign: 'center'}}>Total: ${this.state.total}</div>
       </div>
     );
   }

@@ -24,7 +24,8 @@ const SplitApi = {
     const membersIndex = membersRef.push();
     membersRef.update({
       [sessionId]: {
-        [membersIndex.key]: hostId
+        [membersIndex.key]: hostId,
+        total: 0
       }
     });
 
@@ -107,6 +108,20 @@ const SplitApi = {
       return snapshot.val(); 
     });
   },
+  setTotal: (amount, sessionId) => {
+    const sessionRef = firebaseDb.ref('sessions/' + sessionId);
+    return sessionRef.child('total').set(amount);
+  },
+  stopGetTotal: (sessionId) => {
+    firebaseDb.ref('/sessions/' + sessionId + '/total').off();
+  },
+  getTotalOnChange: (sessionId, callback) => {
+    const sessionRef = firebaseDb.ref('sessions/' + sessionId);
+    sessionRef.child('total').on('value', snapshot => {
+      callback(snapshot.val());
+    });
+    
+  }
 }; 
 
 export default SplitApi;
