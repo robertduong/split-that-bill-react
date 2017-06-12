@@ -58,7 +58,7 @@ const listNames = (users, hostId, hostIcon) => users.map((user, idx) => {
         <Grid>
           <Row>
             <Col xs={10}>{user.name}</Col>
-            <Col xs={2}>PAID</Col>
+            <Col xs={2}>{user.paid? 'PAID' : 'NOT PAID'}</Col>
           </Row>
         </Grid>
       </ListGroupItem>
@@ -136,13 +136,11 @@ class Host extends React.Component {
           this.setState({setCode: true, tabCode: hashid, tabCodeMessage: 'Tab Code'});
 
           SplitApi.getMembersOnChange(this.state.tabCode, members => {
-            console.log("members: "+members);
             const memberNames = [];
             members.map(member => {
               console.log("fetching member "+member);
               SplitApi.getUser(member).then(user => {
                 memberNames.push({uid: user.id, name: user.name});
-
                 this.setState({members: memberNames});
               });
             });
@@ -167,9 +165,15 @@ class Host extends React.Component {
       members.map(member => {
         console.log("mapping on "+member);
         SplitApi.getUser(member).then(user => {
-          memberNames.push({uid: user.id, name: user.name});
-          console.log("found"+user.id+" name:"+ user.name);
-          this.setState({members: memberNames});
+          SplitApi.hasPaid(user.id, this.state.tabCode || tabCodeOrCreate).then(userPaid => {
+            let paid = false;
+            if (userPaid) {
+              paid = true;
+            }
+            memberNames.push({uid: user.id, name: user.name, paid: paid});
+            console.log("paid: "+paid);
+            this.setState({members: memberNames});
+          });
         });
       });
     })
