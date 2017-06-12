@@ -66,9 +66,12 @@ const SplitApi = {
     const membersRef = firebaseDb.ref('/members/' + sessionId);
     membersRef.on('value', snapshot => {
       const val = snapshot.val();
-      const members = []
+      const members = [];
+      console.log(val);
       for (var p in val) {
-        members.push(val[p]);
+        if (p != "total") {
+          members.push(val[p]);
+        }
       }
 
       callback(members);
@@ -121,6 +124,16 @@ const SplitApi = {
       callback(snapshot.val());
     });
     
+  },
+  pay: (userId, sessionId, amount) => {
+    const transactionRef = firebaseDb.ref('transactions/' + sessionId);
+    return transactionRef.set({[userId]: amount});
+  },
+  hasPaid: (userId, sessionId) => {
+    const transactionRef = firebaseDb.ref('transactions/' + sessionId);
+    return transactionRef.child(userId).once('value').then(snapshot => {
+      return snapshot.val();
+    });
   }
 }; 
 

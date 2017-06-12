@@ -42,8 +42,6 @@ const Header = (props) =>
 
 const listNames = (users, hostId, hostIcon) => users.map((user, idx) => {
   if (user.uid === hostId) {
-    console.log("User.uid"+user.uid);
-    console.log("Host.uid"+hostId);
     return (
       <ListGroupItem>
         <Grid>
@@ -165,9 +163,12 @@ class Host extends React.Component {
 
     SplitApi.getMembersOnChange(this.state.tabCode || tabCodeOrCreate, members => {
       const memberNames = [];
+      console.log(members);
       members.map(member => {
+        console.log("mapping on "+member);
         SplitApi.getUser(member).then(user => {
           memberNames.push({uid: user.id, name: user.name});
+          console.log("found"+user.id+" name:"+ user.name);
           this.setState({members: memberNames});
         });
       });

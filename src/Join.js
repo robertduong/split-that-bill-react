@@ -25,7 +25,7 @@ const listNames = (members, host, hostIcon) => members.map((user, idx) => {
         <Grid>
           <Row>
             <Col xs={10}>{user.name}</Col>
-            <Col xs={2}>PAID</Col>
+            <Col xs={2}>{user.paid ? 'PAID' : 'NOT PAID'}</Col>
           </Row>
         </Grid>
       </ListGroupItem>
@@ -54,13 +54,13 @@ const ShowModal = (props) =>
     <Modal.Body>
       <form>
         <FormGroup controlId="formBasicText">
-          <FormControl type="number" autoFocus value={props.paymentAmount} onChange={props.onChange} placeholder={"$26"} />
+          <FormControl type="number" autoFocus value={props.paymentAmount} onChange={props.onChange} placeholder={props.evenAmount} />
         </FormGroup>
         <Button onClick={props.pay}>
           Pay Amount
         </Button>
         <Button onClick={props.pay}>
-          Pay Evenly ($12)
+          Pay Evenly ${props.evenAmount} 
         </Button>
       </form>
     </Modal.Body>
@@ -144,8 +144,15 @@ class Join extends React.Component {
       const memberNames = []; 
       members.map(member => {
         SplitApi.getUser(member).then(user => {
-          memberNames.push({uid: user.id, name: user.name});
-          this.setState({members: memberNames});
+          SplitApi.hasPaid(user.id, tabCode).then(userPaid => {
+            let paid = false;
+            if (userPaid) {
+              paid = true;
+            }
+            memberNames.push({uid: user.id, name: user.name, paid: paid});
+            console.log("paid: "+paid);
+            this.setState({members: memberNames});
+          });
         });
       });
 
@@ -175,6 +182,10 @@ class Join extends React.Component {
 
   pay() {
     this.close();
+    SplitApi.pay(this.props.route.store.getState().user.uid, this.state.tabCode || this.props.params.action, this.state.amount).then(() => {
+      console.log("transaction set");
+      this.forceUpdate();
+    });
     this.setState({showPaymentConfirmModal: true});
   }
 
@@ -186,10 +197,18 @@ class Join extends React.Component {
     this.setState({showPaymentConfirmModal: false});
   }
 
+  evenAmount() {
+    if (this.state.members.length > 1) { 
+      return this.state.total / (this.state.members.length - 1);
+    } else {
+      return this.state.total;
+    }
+  }
+
   render() {
     return (
       <div className="host">
-        <ShowModal modalStyle={centerBlock} showModal={this.state.showModal} close={this.close} host={this.state.host.name} pay={this.pay} onChange={this.onPaymentChange}/>
+        <ShowModal evenAmount={this.evenAmount()} modalStyle={centerBlock} showModal={this.state.showModal} close={this.close} host={this.state.host.name} pay={this.pay} onChange={this.onPaymentChange}/>
         <PaymentConfirmModal showModal={this.state.showPaymentConfirmModal} close={this.onPaymentConfirmClose} amount={this.state.amount} host={this.state.host.name} />
 
         <Grid>
